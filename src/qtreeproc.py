@@ -1,6 +1,5 @@
-import apply_cond
-import sys
-import timeit
+from applycond import apply_logicalop,apply_condition
+
 
 
 def run1_query_tree(tree,line):
@@ -14,27 +13,31 @@ def run1_query_tree(tree,line):
     if type(tree) == tuple:
         root, lefttree, righttree = tree
 
+    #root = root.lower()
 
-    if root!= 'and' and root!= 'or' and root!= 'not':
+    if root != 'and' and root!= 'or' and root!= 'not':
         #print(f'Performing select operation ({root},{lefttree},{righttree})')
-        eval = apply_cond.apply_condition((root, lefttree, righttree), line)
+        eval = apply_condition((root, lefttree, righttree), line)
         #print(f'Performed select operation ({root},{lefttree},{righttree}):: eval {eval}')
         return eval
 
     #evaluate left tree
 
     left_value = run1_query_tree(lefttree,line)
-    #print("peforming select operation ",left_value)
+
+
     #evaluate right tree
 
     #Pruning the Query Tree to minimize the operations
     if root == 'and' and left_value == False:
         right_value = left_value
+    elif root == 'or' and left_value == True:
+        right_value = left_value
     else:
         right_value =  run1_query_tree(righttree,line)
     #print("performing select operation",right_value)
 
-    logicaleval = apply_cond.apply_logicalop(root, left_value, right_value)
+    logicaleval = apply_logicalop(root, left_value, right_value)
     #print(f'{lefttree} {root} {righttree}::{left_value} {root} {right_value}:: finaleval {logicaleval}')
     return logicaleval
 

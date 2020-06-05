@@ -43,7 +43,7 @@ t_ignore = ' '
 
 
 def t_STRING(t):
-	r'\"[a-zA-Z0-9_\s]*\"'
+	r'\"[a-zA-Z0-9_\-\s]*\"'
 	t.type = 'STRING'
 	return t
 

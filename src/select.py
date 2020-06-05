@@ -1,7 +1,7 @@
 #!/usr/bin/env pypy
 import sys
 import argparse
-from qtree_proc import run1_query_tree
+from qtreeproc import run1_query_tree
 from parse_cond import parsecondition
 
 
