@@ -1,0 +1,434 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> select
+Rule 1     select -> simpleexpression
+Rule 2     select -> empty
+Rule 3     value -> INT
+Rule 4     value -> FLOAT
+Rule 5     string -> STRING
+Rule 6     attribute -> COLUMNNAME
+Rule 7     relational -> GREATERTHANEQUAL
+Rule 8     relational -> LESSTHANEQUAL
+Rule 9     relational -> GREATERTHAN
+Rule 10    relational -> LESSTHAN
+Rule 11    relational -> NOTEQUALS
+Rule 12    relational -> EQUALS
+Rule 13    logical -> AND
+Rule 14    logical -> OR
+Rule 15    logical -> NOT
+Rule 16    simpleexpression -> attribute relational value
+Rule 17    simpleexpression -> attribute relational string
+Rule 18    simpleexpression -> LPAREN simpleexpression RPAREN
+Rule 19    simpleexpression -> simpleexpression logical simpleexpression
+Rule 20    simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN
+Rule 21    empty -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 13
+COLUMNNAME           : 6
+EQUALS               : 12
+FLOAT                : 4
+GREATERTHAN          : 9
+GREATERTHANEQUAL     : 7
+INT                  : 3
+LESSTHAN             : 10
+LESSTHANEQUAL        : 8
+LPAREN               : 18 20
+NOT                  : 15
+NOTEQUALS            : 11
+OR                   : 14
+RPAREN               : 18 20
+STRING               : 5
+error                : 
+
+Nonterminals, with rules where they appear
+
+attribute            : 16 17
+empty                : 2
+logical              : 19 20
+relational           : 16 17
+select               : 0
+simpleexpression     : 1 18 19 19 20 20
+string               : 17
+value                : 16
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . select
+    (1) select -> . simpleexpression
+    (2) select -> . empty
+    (16) simpleexpression -> . attribute relational value
+    (17) simpleexpression -> . attribute relational string
+    (18) simpleexpression -> . LPAREN simpleexpression RPAREN
+    (19) simpleexpression -> . simpleexpression logical simpleexpression
+    (20) simpleexpression -> . LPAREN simpleexpression logical simpleexpression RPAREN
+    (21) empty -> .
+    (6) attribute -> . COLUMNNAME
+
+    LPAREN          shift and go to state 5
+    $end            reduce using rule 21 (empty -> .)
+    COLUMNNAME      shift and go to state 6
+
+    select                         shift and go to state 1
+    simpleexpression               shift and go to state 2
+    empty                          shift and go to state 3
+    attribute                      shift and go to state 4
+
+state 1
+
+    (0) S' -> select .
+
+
+
+state 2
+
+    (1) select -> simpleexpression .
+    (19) simpleexpression -> simpleexpression . logical simpleexpression
+    (13) logical -> . AND
+    (14) logical -> . OR
+    (15) logical -> . NOT
+
+    $end            reduce using rule 1 (select -> simpleexpression .)
+    AND             shift and go to state 8
+    OR              shift and go to state 9
+    NOT             shift and go to state 10
+
+    logical                        shift and go to state 7
+
+state 3
+
+    (2) select -> empty .
+
+    $end            reduce using rule 2 (select -> empty .)
+
+
+state 4
+
+    (16) simpleexpression -> attribute . relational value
+    (17) simpleexpression -> attribute . relational string
+    (7) relational -> . GREATERTHANEQUAL
+    (8) relational -> . LESSTHANEQUAL
+    (9) relational -> . GREATERTHAN
+    (10) relational -> . LESSTHAN
+    (11) relational -> . NOTEQUALS
+    (12) relational -> . EQUALS
+
+    GREATERTHANEQUAL shift and go to state 12
+    LESSTHANEQUAL   shift and go to state 13
+    GREATERTHAN     shift and go to state 14
+    LESSTHAN        shift and go to state 15
+    NOTEQUALS       shift and go to state 16
+    EQUALS          shift and go to state 17
+
+    relational                     shift and go to state 11
+
+state 5
+
+    (18) simpleexpression -> LPAREN . simpleexpression RPAREN
+    (20) simpleexpression -> LPAREN . simpleexpression logical simpleexpression RPAREN
+    (16) simpleexpression -> . attribute relational value
+    (17) simpleexpression -> . attribute relational string
+    (18) simpleexpression -> . LPAREN simpleexpression RPAREN
+    (19) simpleexpression -> . simpleexpression logical simpleexpression
+    (20) simpleexpression -> . LPAREN simpleexpression logical simpleexpression RPAREN
+    (6) attribute -> . COLUMNNAME
+
+    LPAREN          shift and go to state 5
+    COLUMNNAME      shift and go to state 6
+
+    simpleexpression               shift and go to state 18
+    attribute                      shift and go to state 4
+
+state 6
+
+    (6) attribute -> COLUMNNAME .
+
+    GREATERTHANEQUAL reduce using rule 6 (attribute -> COLUMNNAME .)
+    LESSTHANEQUAL   reduce using rule 6 (attribute -> COLUMNNAME .)
+    GREATERTHAN     reduce using rule 6 (attribute -> COLUMNNAME .)
+    LESSTHAN        reduce using rule 6 (attribute -> COLUMNNAME .)
+    NOTEQUALS       reduce using rule 6 (attribute -> COLUMNNAME .)
+    EQUALS          reduce using rule 6 (attribute -> COLUMNNAME .)
+
+
+state 7
+
+    (19) simpleexpression -> simpleexpression logical . simpleexpression
+    (16) simpleexpression -> . attribute relational value
+    (17) simpleexpression -> . attribute relational string
+    (18) simpleexpression -> . LPAREN simpleexpression RPAREN
+    (19) simpleexpression -> . simpleexpression logical simpleexpression
+    (20) simpleexpression -> . LPAREN simpleexpression logical simpleexpression RPAREN
+    (6) attribute -> . COLUMNNAME
+
+    LPAREN          shift and go to state 5
+    COLUMNNAME      shift and go to state 6
+
+    simpleexpression               shift and go to state 19
+    attribute                      shift and go to state 4
+
+state 8
+
+    (13) logical -> AND .
+
+    LPAREN          reduce using rule 13 (logical -> AND .)
+    COLUMNNAME      reduce using rule 13 (logical -> AND .)
+
+
+state 9
+
+    (14) logical -> OR .
+
+    LPAREN          reduce using rule 14 (logical -> OR .)
+    COLUMNNAME      reduce using rule 14 (logical -> OR .)
+
+
+state 10
+
+    (15) logical -> NOT .
+
+    LPAREN          reduce using rule 15 (logical -> NOT .)
+    COLUMNNAME      reduce using rule 15 (logical -> NOT .)
+
+
+state 11
+
+    (16) simpleexpression -> attribute relational . value
+    (17) simpleexpression -> attribute relational . string
+    (3) value -> . INT
+    (4) value -> . FLOAT
+    (5) string -> . STRING
+
+    INT             shift and go to state 22
+    FLOAT           shift and go to state 23
+    STRING          shift and go to state 24
+
+    value                          shift and go to state 20
+    string                         shift and go to state 21
+
+state 12
+
+    (7) relational -> GREATERTHANEQUAL .
+
+    INT             reduce using rule 7 (relational -> GREATERTHANEQUAL .)
+    FLOAT           reduce using rule 7 (relational -> GREATERTHANEQUAL .)
+    STRING          reduce using rule 7 (relational -> GREATERTHANEQUAL .)
+
+
+state 13
+
+    (8) relational -> LESSTHANEQUAL .
+
+    INT             reduce using rule 8 (relational -> LESSTHANEQUAL .)
+    FLOAT           reduce using rule 8 (relational -> LESSTHANEQUAL .)
+    STRING          reduce using rule 8 (relational -> LESSTHANEQUAL .)
+
+
+state 14
+
+    (9) relational -> GREATERTHAN .
+
+    INT             reduce using rule 9 (relational -> GREATERTHAN .)
+    FLOAT           reduce using rule 9 (relational -> GREATERTHAN .)
+    STRING          reduce using rule 9 (relational -> GREATERTHAN .)
+
+
+state 15
+
+    (10) relational -> LESSTHAN .
+
+    INT             reduce using rule 10 (relational -> LESSTHAN .)
+    FLOAT           reduce using rule 10 (relational -> LESSTHAN .)
+    STRING          reduce using rule 10 (relational -> LESSTHAN .)
+
+
+state 16
+
+    (11) relational -> NOTEQUALS .
+
+    INT             reduce using rule 11 (relational -> NOTEQUALS .)
+    FLOAT           reduce using rule 11 (relational -> NOTEQUALS .)
+    STRING          reduce using rule 11 (relational -> NOTEQUALS .)
+
+
+state 17
+
+    (12) relational -> EQUALS .
+
+    INT             reduce using rule 12 (relational -> EQUALS .)
+    FLOAT           reduce using rule 12 (relational -> EQUALS .)
+    STRING          reduce using rule 12 (relational -> EQUALS .)
+
+
+state 18
+
+    (18) simpleexpression -> LPAREN simpleexpression . RPAREN
+    (20) simpleexpression -> LPAREN simpleexpression . logical simpleexpression RPAREN
+    (19) simpleexpression -> simpleexpression . logical simpleexpression
+    (13) logical -> . AND
+    (14) logical -> . OR
+    (15) logical -> . NOT
+
+    RPAREN          shift and go to state 25
+    AND             shift and go to state 8
+    OR              shift and go to state 9
+    NOT             shift and go to state 10
+
+    logical                        shift and go to state 26
+
+state 19
+
+    (19) simpleexpression -> simpleexpression logical simpleexpression .
+    (19) simpleexpression -> simpleexpression . logical simpleexpression
+    (13) logical -> . AND
+    (14) logical -> . OR
+    (15) logical -> . NOT
+
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+  ! shift/reduce conflict for NOT resolved as shift
+    $end            reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .)
+    RPAREN          reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .)
+    AND             shift and go to state 8
+    OR              shift and go to state 9
+    NOT             shift and go to state 10
+
+  ! AND             [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+  ! OR              [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+  ! NOT             [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+
+    logical                        shift and go to state 7
+
+state 20
+
+    (16) simpleexpression -> attribute relational value .
+
+    AND             reduce using rule 16 (simpleexpression -> attribute relational value .)
+    OR              reduce using rule 16 (simpleexpression -> attribute relational value .)
+    NOT             reduce using rule 16 (simpleexpression -> attribute relational value .)
+    $end            reduce using rule 16 (simpleexpression -> attribute relational value .)
+    RPAREN          reduce using rule 16 (simpleexpression -> attribute relational value .)
+
+
+state 21
+
+    (17) simpleexpression -> attribute relational string .
+
+    AND             reduce using rule 17 (simpleexpression -> attribute relational string .)
+    OR              reduce using rule 17 (simpleexpression -> attribute relational string .)
+    NOT             reduce using rule 17 (simpleexpression -> attribute relational string .)
+    $end            reduce using rule 17 (simpleexpression -> attribute relational string .)
+    RPAREN          reduce using rule 17 (simpleexpression -> attribute relational string .)
+
+
+state 22
+
+    (3) value -> INT .
+
+    AND             reduce using rule 3 (value -> INT .)
+    OR              reduce using rule 3 (value -> INT .)
+    NOT             reduce using rule 3 (value -> INT .)
+    $end            reduce using rule 3 (value -> INT .)
+    RPAREN          reduce using rule 3 (value -> INT .)
+
+
+state 23
+
+    (4) value -> FLOAT .
+
+    AND             reduce using rule 4 (value -> FLOAT .)
+    OR              reduce using rule 4 (value -> FLOAT .)
+    NOT             reduce using rule 4 (value -> FLOAT .)
+    $end            reduce using rule 4 (value -> FLOAT .)
+    RPAREN          reduce using rule 4 (value -> FLOAT .)
+
+
+state 24
+
+    (5) string -> STRING .
+
+    AND             reduce using rule 5 (string -> STRING .)
+    OR              reduce using rule 5 (string -> STRING .)
+    NOT             reduce using rule 5 (string -> STRING .)
+    $end            reduce using rule 5 (string -> STRING .)
+    RPAREN          reduce using rule 5 (string -> STRING .)
+
+
+state 25
+
+    (18) simpleexpression -> LPAREN simpleexpression RPAREN .
+
+    AND             reduce using rule 18 (simpleexpression -> LPAREN simpleexpression RPAREN .)
+    OR              reduce using rule 18 (simpleexpression -> LPAREN simpleexpression RPAREN .)
+    NOT             reduce using rule 18 (simpleexpression -> LPAREN simpleexpression RPAREN .)
+    $end            reduce using rule 18 (simpleexpression -> LPAREN simpleexpression RPAREN .)
+    RPAREN          reduce using rule 18 (simpleexpression -> LPAREN simpleexpression RPAREN .)
+
+
+state 26
+
+    (20) simpleexpression -> LPAREN simpleexpression logical . simpleexpression RPAREN
+    (19) simpleexpression -> simpleexpression logical . simpleexpression
+    (16) simpleexpression -> . attribute relational value
+    (17) simpleexpression -> . attribute relational string
+    (18) simpleexpression -> . LPAREN simpleexpression RPAREN
+    (19) simpleexpression -> . simpleexpression logical simpleexpression
+    (20) simpleexpression -> . LPAREN simpleexpression logical simpleexpression RPAREN
+    (6) attribute -> . COLUMNNAME
+
+    LPAREN          shift and go to state 5
+    COLUMNNAME      shift and go to state 6
+
+    simpleexpression               shift and go to state 27
+    attribute                      shift and go to state 4
+
+state 27
+
+    (20) simpleexpression -> LPAREN simpleexpression logical simpleexpression . RPAREN
+    (19) simpleexpression -> simpleexpression logical simpleexpression .
+    (19) simpleexpression -> simpleexpression . logical simpleexpression
+    (13) logical -> . AND
+    (14) logical -> . OR
+    (15) logical -> . NOT
+
+  ! shift/reduce conflict for RPAREN resolved as shift
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+  ! shift/reduce conflict for NOT resolved as shift
+    RPAREN          shift and go to state 28
+    AND             shift and go to state 8
+    OR              shift and go to state 9
+    NOT             shift and go to state 10
+
+  ! RPAREN          [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+  ! AND             [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+  ! OR              [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+  ! NOT             [ reduce using rule 19 (simpleexpression -> simpleexpression logical simpleexpression .) ]
+
+    logical                        shift and go to state 7
+
+state 28
+
+    (20) simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .
+
+    AND             reduce using rule 20 (simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .)
+    OR              reduce using rule 20 (simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .)
+    NOT             reduce using rule 20 (simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .)
+    $end            reduce using rule 20 (simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .)
+    RPAREN          reduce using rule 20 (simpleexpression -> LPAREN simpleexpression logical simpleexpression RPAREN .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for AND in state 19 resolved as shift
+WARNING: shift/reduce conflict for OR in state 19 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 19 resolved as shift
+WARNING: shift/reduce conflict for RPAREN in state 27 resolved as shift
+WARNING: shift/reduce conflict for AND in state 27 resolved as shift
+WARNING: shift/reduce conflict for OR in state 27 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 27 resolved as shift
