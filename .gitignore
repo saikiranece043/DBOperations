@@ -139,3 +139,7 @@ cython_debug/
 
 # Resources are not tracked
 resources/
+
+# ignore tracking of pypy virtual environment
+.pypy/
+
