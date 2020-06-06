@@ -39,6 +39,15 @@ def user_interface():
 
 
 
+def free_resources(arguments):
+    """
+    Function to close the input and output file or stdin/out references
+    :param arguments:
+    :return: void
+    """
+    arguments[1].close()
+    arguments[2].close()
+
 
 
 def column_offset_validation(arguments):
@@ -57,25 +66,32 @@ def column_offset_validation(arguments):
             if operand.startswith('#'):
                 #if you are here the column offset can be a integer or string
                 if operand[1:].isdecimal():
-                    data_error_handler(operand[1:],attributesCount)
+                    data_error_handler(operand[1:],attributesCount,arguments)
                 else:
                     # This block of code is executed for float or string
                     if operand[1:] not in header:
                         print(f'column reference {operand} entered is incorrect')
+                        free_resources(arguments)
                         sys.exit(1)
 
     else:
+        #no header so setting the file pointer back to first line
+
+        #if inputtype != None: (while going back is an option in files not for stdin)
+        #    inputfile.seek(0)
         for operand in operands:
             if operand.startswith('#'):
                 if operand[1:].isdecimal():
-                    data_error_handler(operand,attributesCount)
+                    data_error_handler(operand,attributesCount,arguments)
                 else:
                     print(f'column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
+                    free_resources(arguments)
                     sys.exit(1)
+    return header
 
 
 
-def data_error_handler(data,attributesCount):
+def data_error_handler(data,attributesCount,arguments):
     """
     Function performs validation of the input data
     Checks if the data is string or integer
@@ -88,10 +104,12 @@ def data_error_handler(data,attributesCount):
 
     if not data[1:].isdecimal():
         print(f'The column offset {data} should be an integer')
+        free_resources(arguments)
         sys.exit(1)
     # the column offset should be between 0...(attributesCount - 1)
     if int(data[1:]) not in range(0,attributesCount):
         print(f'The column offset {data} should be in the range (0, {attributesCount - 1 }) ')
+        free_resources(arguments)
         sys.exit(1)
 
 
@@ -187,17 +205,39 @@ this is the part that actually scans through the input and produces the output. 
 """
 
 
-def myselect(arguments):
+def myselect(arguments,firstline):
     condition = arguments[0]
     myinput = arguments[1]
-    myinput.seek(0)
     myoutput = arguments[2]
+
     if arguments[3]:  # this is the header switch
+        cols = {}
+        for idx,name in enumerate(firstline.split(arguments[4])):
+            cols[name] = idx
+        arguments.append(cols)
         # copy first line directly from input to output
-        myoutput.write(myinput.readline())
-    for line in myinput:
-        if run1_query_tree(condition, line):
-            myoutput.write(line)
+        myoutput.write(firstline)
+        for line in myinput:
+            if run1_query_tree(condition, line, arguments):
+                myoutput.write(line)
+    else:
+        if run1_query_tree(condition, firstline, arguments):
+            myoutput.write(firstline)
+        for line in myinput:
+            if run1_query_tree(condition, line, arguments):
+                myoutput.write(line)
+
+
+def projection(line,columnsToProject=[1,2,3]):
+    """
+    The function takes a row and returns a modified row with required columns data
+    :param line:
+    :param columnsToProject:
+    :return: user interested columns data separated by a separator
+    """
+    rowdata = line.split('|')
+    return "|".join([rowdata[columnNumber-1] for columnNumber in columnsToProject])
+
 
 
 # main program starts here
@@ -206,12 +246,16 @@ def main():
     #extracting all the arguments
     arguments = user_interface()
 
+
     #setting input and output
     arguments = set_input_output(arguments)
 
-    #column offset error handling
-    column_offset_validation(arguments)
+    print(arguments)
+    #column offset error handling (for header true and false)
+    #grabbing the firstline to ensure we evaluate all lines
+    firstline = column_offset_validation(arguments)
 
+    #print(arguments)ls
     #parsing the condition
     try:
         arguments[0] = parsecondition(arguments[0])
@@ -220,21 +264,15 @@ def main():
             print('something broken in the condition or the parser')
             sys.exit(1)
     except Exception as e:
+        free_resources(arguments)
         print(e)
         sys.exit(1)
 
 
+    myselect(arguments,firstline)
 
-    #print(arguments)
 
-    myselect(arguments)
-
-    arguments[1].close()
-    arguments[2].close()
-    #querytree = ParseCondition.parsecondition(arguments[0])
-    #arguments[0] = parse_condition(arguments[0])
-    #print(querytree)
-
+    free_resources(arguments)
 
 main()
 

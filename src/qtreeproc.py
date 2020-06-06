@@ -2,7 +2,7 @@ from applycond import apply_logicalop,apply_condition
 
 
 
-def run1_query_tree(tree,line):
+def run1_query_tree(tree,line, arguments):
     '''
     Returns a boolean after applying the query tree on the input line
     :param tree: Query  tree
@@ -17,7 +17,7 @@ def run1_query_tree(tree,line):
 
     if root != 'and' and root!= 'or' and root!= 'not':
         #print(f'Performing select operation ({root},{lefttree},{righttree})')
-        eval = apply_condition((root, lefttree, righttree), line)
+        eval = apply_condition((root, lefttree, righttree), line, arguments)
         #print(f'Performed select operation ({root},{lefttree},{righttree}):: eval {eval}')
         return eval
 
@@ -56,15 +56,7 @@ query_lineitems = ('and',('==','#9','"N"'),('and' ,('==','#15','"RAIL"'),('==','
 
 '''
 
-def projection(line,columnsToProject=[1,2,3]):
-    """
-    The function takes a row and returns a modified row with required columns data
-    :param line:
-    :param columnsToProject:
-    :return: user interested columns data separated by a separator
-    """
-    rowdata = line.split('|')
-    return "|".join([rowdata[columnNumber-1] for columnNumber in columnsToProject])
+
 
 
 def readfile():
