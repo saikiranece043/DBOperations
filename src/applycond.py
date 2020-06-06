@@ -11,10 +11,7 @@ def get_type(op):
         try:
             return float(op)
         except:
-            if op.startswith('"') and op.endswith('"'):
-                return op[1:-1]
-            else:
-                return op
+            return op
 
 
 def myeval(op, line):
@@ -24,16 +21,18 @@ def myeval(op, line):
     :param line: line read from the input data file
     :return: column and constant converted into appropriate types
     '''
-    if op.find("#") >= 0:
-        index = op[1:]
-        if index.isdecimal():
-           index = int(index)
-        fields = line.split('|')
-        # we assume fields denoted starting at 1, arrays start at 0
-        cvalue = fields[index - 1]
-        return get_type(cvalue)
+
+    index = op[1:]
+    # if a column is referred by a number
+    if index.isdecimal():
+       index = int(index)
+       fields = line.split('|')
+       cvalue = fields[index - 1]
+       return get_type(cvalue)
+    # if a column is referred by its name
     else:
-        return get_type(op)
+        pass
+
 
 
 def apply_condition(condition, line):
@@ -44,18 +43,18 @@ def apply_condition(condition, line):
     :return: True or False
     '''
     if (condition[0] == '>'):
-        return (myeval(condition[1], line) > myeval(condition[2], line))
+        return (myeval(condition[1], line) > condition[2])
     elif (condition[0] == '<'):
-        return (myeval(condition[1], line) < myeval(condition[2], line))
+        return (myeval(condition[1], line) < condition[2])
     elif (condition[0] == '<='):
-        return (myeval(condition[1], line) <= myeval(condition[2], line))
+        return (myeval(condition[1], line) <= condition[2])
     elif (condition[0] == '>='):
-        return (myeval(condition[1], line) >= myeval(condition[2], line))
+        return (myeval(condition[1], line) >= condition[2])
     elif (condition[0] == '=='):
         #print(myeval(condition[1],line),myeval(condition[2],line))
-        return (myeval(condition[1], line) == myeval(condition[2], line))
+        return (myeval(condition[1], line) == condition[2])
     elif (condition[0] == '!='):
-        return (myeval(condition[1], line) != myeval(condition[2], line))
+        return (myeval(condition[1], line) != condition[2])
     else:
         print("wrong or unallowed operator!")
         exit(-1)

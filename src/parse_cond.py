@@ -45,6 +45,7 @@ t_ignore = ' '
 def t_STRING(t):
 	r'\"[a-zA-Z0-9_\-\s]*\"'
 	t.type = 'STRING'
+	t.value = t.value[1:-1]
 	return t
 
 
@@ -56,13 +57,13 @@ def t_COLUMNNAME(t):
 
 def t_FLOAT(t):
 	r'\d+\.\d+'
-	t.value = t.value
+	t.value = float(t.value)
 	return t
 
 
 def t_INT(t):
 	r'\d+'
-	t.value = t.value
+	t.value = int(t.value)
 	return t
 
 
@@ -205,4 +206,4 @@ def runtestcases():
 		print("Query \n", test)
 		print("Query Parsing Tree\n", parsecondition(test))
 
-# runtestcases()
+#runtestcases()
