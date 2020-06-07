@@ -29,12 +29,14 @@ def user_interface():
     parser.add_argument("-o", "--output", help="output file")
     parser.add_argument("-h", "--header", default=False, action="store_true", help="whether input file has header")
     parser.add_argument("-s", "--split", default=',', help="line separator")
+    parser.add_argument("-p", "--projection", help="columns to project")
     args = parser.parse_args()
     resultlist.append(args.condition)
     resultlist.append(args.input)
     resultlist.append(args.output)
     resultlist.append(args.header)
     resultlist.append(args.split)
+    resultlist.append(args.projection)
     return resultlist
 
 
@@ -66,17 +68,16 @@ def column_offset_validation(arguments):
             if operand.startswith('#'):
                 #if you are here the column offset can be a integer or string
                 if operand[1:].isdecimal():
-                    data_error_handler(operand[1:],attributesCount,arguments)
+                    data_error_handler(operand,attributesCount,arguments)
                 else:
                     # This block of code is executed for float or string
                     if operand[1:] not in header:
                         print(f'column reference {operand} entered is incorrect')
                         free_resources(arguments)
-                        sys.exit(1)
+                        sys.exit(-1)
 
     else:
         #no header so setting the file pointer back to first line
-
         #if inputtype != None: (while going back is an option in files not for stdin)
         #    inputfile.seek(0)
         for operand in operands:
@@ -86,7 +87,7 @@ def column_offset_validation(arguments):
                 else:
                     print(f'column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
                     free_resources(arguments)
-                    sys.exit(1)
+                    sys.exit(-1)
     return header
 
 
@@ -105,12 +106,12 @@ def data_error_handler(data,attributesCount,arguments):
     if not data[1:].isdecimal():
         print(f'The column offset {data} should be an integer')
         free_resources(arguments)
-        sys.exit(1)
+        sys.exit(-1)
     # the column offset should be between 0...(attributesCount - 1)
     if int(data[1:]) not in range(0,attributesCount):
         print(f'The column offset {data} should be in the range (0, {attributesCount - 1 }) ')
         free_resources(arguments)
-        sys.exit(1)
+        sys.exit(-1)
 
 
 """
@@ -133,7 +134,7 @@ def parse_condition(cond):
     #print(list)
     if ("AND" in list or "OR" in list):
         #print("complex condition parsing here")
-        exit(0)
+        exit(-1)
     condition.append(list[1])
     condition.append(list[0])
     #condition.append(list[2])
@@ -169,37 +170,6 @@ def set_input_output(arguments):
     return arguments
 
 
-# evaluate a single operand, it's either a reference or a number (for now)
-def myeval(op, line):
-    if op.find("#") >= 0:
-        index = op[1:]
-        index = int(index)
-        fields = line.split(',')
-        # we assume fields denoted starting at 1, arrays start at 0
-        return int(fields[index - 1])
-    else:
-        return int(op)
-
-
-# evaluates the condition on the line of input to produce a truth value.
-# only simple conditions for now.
-
-def apply(condition, line):
-    if (condition[0] == '>'):
-        return (myeval(condition[1], line) > myeval(condition[2], line))
-    elif (condition[0] == '<='):
-        return (myeval(condition[1], line) <= myeval(condition[2], line))
-    elif (condition[0] == '>='):
-        return (myeval(condition[1], line) >= myeval(condition[2], line))
-    elif (condition[0] == '=='):
-        return (myeval(condition[1], line) == myeval(condition[2], line))
-    elif (condition[0] == '!='):
-        return (myeval(condition[1], line) != myeval(condition[2], line))
-    else:
-        print("wrong or unallowed operator!")
-        exit(-1)
-
-
 """
 this is the part that actually scans through the input and produces the output. First the header is copied if it exists. Then the input is checked line by line and copied if appropriate.
 """
@@ -209,26 +179,87 @@ def myselect(arguments,firstline):
     condition = arguments[0]
     myinput = arguments[1]
     myoutput = arguments[2]
+    projection = arguments[5]
+    hasheader = arguments[3]
+    splitter = arguments[4]
+    totalcols = len(firstline.split(splitter))
 
-    if arguments[3]:  # this is the header switch
+    if hasheader:  # this is the header switch
+
+        # column names and the index numbers are stored as dictionary for quick access in the lopp
         cols = {}
-        for idx,name in enumerate(firstline.split(arguments[4])):
-            cols[name] = idx
+        for idx,name in enumerate(firstline.split(splitter)):
+            cols[name.strip('\n')] = idx
         arguments.append(cols)
+
         # copy first line directly from input to output
         myoutput.write(firstline)
-        for line in myinput:
-            if run1_query_tree(condition, line, arguments):
-                myoutput.write(line)
+
+        #translating the user column references of projection to numbers
+        colstoproject = []
+        for colref in projection.split(','):
+            if colref[1:].isdecimal():
+                if colref[1:] not in range(0, totalcols):
+                    print("The column referenced in projection by number is invalid")
+                    sys.exit(-1)
+                colstoproject.append(int(colref[1:])-1)
+            else:
+                if colref[1:] not in firstline.split(splitter):
+                    print("The column referenced in projection by name is invalid")
+                    sys.exit(-1)
+                colstoproject.append(int(cols[colref[1:]]))
+
+        # if projection is required a different path to be taken
+        # This is to avoid conditional check within the loop
+        if projection:
+            for line in myinput:
+                if run1_query_tree(condition, line, arguments):
+                    line = projection(line,colstoproject)
+                    myoutput.write(line)
+        # projection is not required here
+        else:
+            for line in myinput:
+                if run1_query_tree(condition, line, arguments):
+                    myoutput.write(line)
     else:
-        if run1_query_tree(condition, firstline, arguments):
-            myoutput.write(firstline)
-        for line in myinput:
-            if run1_query_tree(condition, line, arguments):
-                myoutput.write(line)
+
+        # if projection is required a different path to be taken
+        # This is to avoid conditional check within the loop
+        if projection:
 
 
-def projection(line,columnsToProject=[1,2,3]):
+            # translating the user column references of projection to numbers
+            colstoproject =[]
+            for colref in projection.split(','):
+                if colref[1:].isdecimal():
+                    if colref[1:] not in range(0,totalcols):
+                        print("The column referenced in projection by number is invalid")
+                        sys.exit(-1)
+                    colstoproject.append(int(colref[1:]) - 1)
+                else:
+                    print("The column referenced in projection by number is invalid")
+                    sys.exit(-1)
+
+
+            # selection performed on the first line
+            if run1_query_tree(condition, firstline, arguments):
+                firstline = projection(firstline,colstoproject)
+                myoutput.write(firstline)
+
+            #selection performed on each of the rest of the lines
+            for line in myinput:
+                if run1_query_tree(condition, line, arguments):
+                    line = projection(line,colstoproject)
+                    myoutput.write(line)
+        else:
+            if run1_query_tree(condition, firstline, arguments):
+                myoutput.write(firstline)
+            for line in myinput:
+                if run1_query_tree(condition, line, arguments):
+                    myoutput.write(line)
+
+
+def projection(line,colstoproject):
     """
     The function takes a row and returns a modified row with required columns data
     :param line:
@@ -236,8 +267,7 @@ def projection(line,columnsToProject=[1,2,3]):
     :return: user interested columns data separated by a separator
     """
     rowdata = line.split('|')
-    return "|".join([rowdata[columnNumber-1] for columnNumber in columnsToProject])
-
+    return "|".join([rowdata[columnNumber] for columnNumber in colstoproject])
 
 
 # main program starts here
@@ -246,7 +276,7 @@ def main():
     #extracting all the arguments
     arguments = user_interface()
 
-
+    print(arguments)
     #setting input and output
     arguments = set_input_output(arguments)
 
@@ -262,11 +292,11 @@ def main():
 
         if arguments[0] == None:
             print('something broken in the condition or the parser')
-            sys.exit(1)
+            sys.exit(-1)
     except Exception as e:
         free_resources(arguments)
         print(e)
-        sys.exit(1)
+        sys.exit(-1)
 
 
     myselect(arguments,firstline)

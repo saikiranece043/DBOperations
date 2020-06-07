@@ -23,7 +23,7 @@ def run1_query_tree(tree,line, arguments):
 
     #evaluate left tree
 
-    left_value = run1_query_tree(lefttree,line)
+    left_value = run1_query_tree(lefttree,line,arguments)
 
 
     #evaluate right tree
@@ -34,7 +34,7 @@ def run1_query_tree(tree,line, arguments):
     elif root == 'or' and left_value == True:
         right_value = left_value
     else:
-        right_value =  run1_query_tree(righttree,line)
+        right_value =  run1_query_tree(righttree,line,arguments)
     #print("performing select operation",right_value)
 
     logicaleval = apply_logicalop(root, left_value, right_value)
@@ -42,38 +42,3 @@ def run1_query_tree(tree,line, arguments):
     return logicaleval
 
 
-query3 = ('and', ('and', ('or', ('>', '#20', 40), ('>=', '#5', 6)), ('and', ('>=', '#2', 5), ('=', '#2', '"test"'))), ('>', '#1', 2))
-query = ('and',('>','#1','3'),('>=','#4','5'))
-query1 = ('and',('>','#1','3'),('and' ,('>','#4','5'),('>','#6','2')) )
-query_lineitems = ('and',('==','#9','"N"'),('and' ,('==','#15','"RAIL"'),('==','#14','"DELIVER IN PERSON"')) )
-
-
-#print(run1_query_tree(query3))
-
-'''
-1|310379|15395|1|17|23619.12|0.04|0.02|N|O|1996-03-13|1996-02-12|1996-03-22|DELIVER IN PERSON|TRUCK|egular courts above the
-1|Supplier#000000001| N kD4on9OM Ipw3,gf0JBoQDd7tgrzrddZ|17|27-918-335-1736|5755.94|each slyly above the careful
-
-'''
-
-
-
-
-def readfile():
-    try:
-        file = open('../resources/lineitem.csv', 'r')
-        for line in file.readlines():
-                eval = run1_query_tree(query_lineitems,line)
-                if eval:
-                    print(line)
-    except OSError:
-        print("error reading the file")
-    finally:
-        file.close()
-
-
-#time taken to execute the program 138.774661164
-# start = timeit.default_timer()
-# readfile()
-# end = timeit.default_timer()
-# print(f'time taken to execute the program {end - start}')

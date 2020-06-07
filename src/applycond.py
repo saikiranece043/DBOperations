@@ -36,7 +36,7 @@ def myeval(op, line, arguments):
        return get_type(cvalue)
     # if a column is referred by its name
     else:
-        cvalue = fields[arguments[5][index]]
+        cvalue = fields[arguments[-1][index]]
         return get_type(cvalue)
 
 
