@@ -1,43 +1,40 @@
 #Performing Select Operations on Input Data files
 
-### Sample command from user
+### Sample commands from user
 
-`python3 Select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv` 
+`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv`
+`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv -p '#1,#2'` 
 
 #### Args to the program
    * Condition (-c)
    * inputfile (-i)
    * ouputfile (-o)
    * headerflag -h
-   * line separator -s
-   * projection ?? 
+   * line separator -s (default value ',')
+   * projection -p
 
-#### Inputs Validation and Error Handling
-   * Validate each input provided by the user
-        + Error checking on condition
-        + Error checking on column offset
-   * Return an appropriate error to the user
+#### Condition arg passed to the user
+   * Condition is parsed by the ply lexer and parser
+   * Extracts the tokens from the condition and a query tree is generated
+   * The query tree is applied on each line of the input recursively
 
-#### Parse Condition
-   * Simple condition parsing
-   * Complex condition parsing
-       + Recursive Condition Parsing
-   
-#### Set Input and Output Arguments
-   * Setting the Input File
-   * Setting the Output File
+#### Input to the program
+   * The input arg indicates the program should apply the condition on the contents of the file
+   * Input data to the program can also be passed from the standard input
+
+#### Output
+   * Program would write the output to the file provided by the user in command as arg -o '{filename}'
+   * The output would be written to the standard output if the user doesn't pass -o argument to the program
  
-#### Evaluation of Conditions
-   * Evaluate logical operations on each line of input
-   * Evaluate Relational operations on each line of input
+#### Header Flag
+   * If the flag -h is found in the command the program would assume the input first line is header
+   * In the absence the program would assume there is no header information in the input 
 
-#### Tidying the Input from user for evaluation
-   * Converting data to appropriate type
+#### seperator
+   * In the absence of -s the program would assume the input data delimiter is ','
+   * User can overwrite this by sending an arg -s with their desired delimiter 
 
-#### Performing Select Operation
-   * Writing the final results 
+#### Projection
+   * In the absence of projection the program wouldn't reduce the data written to output
+   * In the presence of projection arg the program would write only the desired data to output stream
 
-### Error Handling
-  * Tokens handling is performed within 
-  * column offset error handling 
-       + set the input and output args 
