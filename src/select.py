@@ -186,7 +186,8 @@ def myselect(arguments,firstline):
 
     if hasheader:  # this is the header switch
 
-        # column names and the index numbers are stored as dictionary for quick access in the lopp
+        # column names and the index numbers are stored as dictionary for quick access in the loop
+        # This is handled early for performance gains
         cols = {}
         for idx,name in enumerate(firstline.split(splitter)):
             cols[name.strip('\n')] = idx
@@ -196,6 +197,7 @@ def myselect(arguments,firstline):
         myoutput.write(firstline)
 
         #translating the user column references of projection to numbers
+        # this is handled early for performance gain
         colstoproject = []
         for colref in projection.split(','):
             if colref[1:].isdecimal():
@@ -214,8 +216,9 @@ def myselect(arguments,firstline):
         if projection:
             for line in myinput:
                 if run1_query_tree(condition, line, arguments):
-                    line = projection(line,colstoproject)
+                    line = projection_cols(line,colstoproject)
                     myoutput.write(line)
+
         # projection is not required here
         else:
             for line in myinput:
@@ -230,27 +233,29 @@ def myselect(arguments,firstline):
 
             # translating the user column references of projection to numbers
             colstoproject =[]
+
             for colref in projection.split(','):
                 if colref[1:].isdecimal():
-                    if colref[1:] not in range(0,totalcols):
-                        print("The column referenced in projection by number is invalid")
+                    colrefi = int(colref[1:])
+                    if colrefi not in range(0,totalcols):
+                        print("The column referenced in projection by number is not invalid")
                         sys.exit(-1)
-                    colstoproject.append(int(colref[1:]) - 1)
+                    colstoproject.append(colrefi - 1)
                 else:
-                    print("The column referenced in projection by number is invalid")
+                    print("The column referenced in projection by number is a string so invalid")
                     sys.exit(-1)
 
 
             # selection performed on the first line
             if run1_query_tree(condition, firstline, arguments):
-                firstline = projection(firstline,colstoproject)
-                myoutput.write(firstline)
+                tooutput = projection_cols(firstline,colstoproject)
+                myoutput.write(tooutput)
 
             #selection performed on each of the rest of the lines
             for line in myinput:
                 if run1_query_tree(condition, line, arguments):
-                    line = projection(line,colstoproject)
-                    myoutput.write(line)
+                    tooutput = projection_cols(line,colstoproject)
+                    myoutput.write(tooutput)
         else:
             if run1_query_tree(condition, firstline, arguments):
                 myoutput.write(firstline)
@@ -259,7 +264,7 @@ def myselect(arguments,firstline):
                     myoutput.write(line)
 
 
-def projection(line,colstoproject):
+def projection_cols(line,projectedcols):
     """
     The function takes a row and returns a modified row with required columns data
     :param line:
@@ -267,7 +272,8 @@ def projection(line,colstoproject):
     :return: user interested columns data separated by a separator
     """
     rowdata = line.split('|')
-    return "|".join([rowdata[columnNumber] for columnNumber in colstoproject])
+    result ="|".join([rowdata[columnNumber] for columnNumber in projectedcols])
+    return result + '\n'
 
 
 # main program starts here
@@ -280,7 +286,7 @@ def main():
     #setting input and output
     arguments = set_input_output(arguments)
 
-    print(arguments)
+    #print(arguments)
     #column offset error handling (for header true and false)
     #grabbing the firstline to ensure we evaluate all lines
     firstline = column_offset_validation(arguments)
