@@ -2,9 +2,9 @@
 
 #### Examples to run the program
 
-`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv`
+`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv`
 
-`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv -p '#1,#2' -s '|'`
+`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv -p '#1,#2' -s '|'`
 
 #### Args to the program
    * Condition (-c)
@@ -25,7 +25,7 @@
 
 #### Output
    * Program would write the output to the file provided by the user in command as arg -o '{filename}'
-   * The output would be written to the standard output if the user doesn't pass -o argument to the program
+   * The output would be written to the standard output if the user doesn't s -o argument to the program
 
 #### Header Flag
    * If the flag -h is found in the command the program would assume the input first line is header
