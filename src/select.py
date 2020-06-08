@@ -55,15 +55,18 @@ def free_resources(arguments):
 def column_offset_validation(arguments):
     """
     This function is to validate the column offset and return user friendly errors
-    :return: void
+    It also returns the line against which it performs the column reference validation
+    :param : arguments - args provided by the user to the program
+    :return: returns the first line of the input stream (file or stdin)
     """
     inputfile = arguments[1]
     header = inputfile.readline()
     splitter = arguments[4]
     attributesCount = len(header.split(splitter))
     operands = arguments[0].split()
+    hasheader = arguments[3]
 
-    if arguments[3]:
+    if hasheader:
         for operand in operands:
             if operand.startswith('#'):
                 #if you are here the column offset can be a integer or string
@@ -97,8 +100,9 @@ def data_error_handler(data,attributesCount,arguments):
     Function performs validation of the input data
     Checks if the data is string or integer
     If the data is integer it further checks if it's contained within a range
-    :param data:
-    :param range:
+    :param data: data to validate for errors
+    :param attributesCount: number of columns in the input
+    :param arguments: args provided by the user to the program
     :return: void
     """
     # if you are here that means the column offset should always be an integer
@@ -114,33 +118,6 @@ def data_error_handler(data,attributesCount,arguments):
         sys.exit(-1)
 
 
-"""
-parse_condition receives a string with the first argument from user interface, breaks it down into components, 
-checks that it's a well-formed condition, returns them in a list. 
-In the list the operator always comes first, and the two operands later. 
-For instance, "#3 > 5" becomes [">", '#3', 5] Complex conditions are parsed recursively:
-"#3 > 5 and #2 == 5" becomes ["AND", [">", '#3', 5], ["==", '#2', 5]]
-This recursive structure makes evaluation easy.
-"""
-
-
-def parse_condition(cond):
-    OPERATORS = ['>','<','=' ,'>=','<=']
-    condition = []
-    cond = "".join([w and w + " " for w in cond.split()])
-    # processing the condition. Error checking here.
-    #print(cond)
-    list = cond.split()
-    #print(list)
-    if ("AND" in list or "OR" in list):
-        #print("complex condition parsing here")
-        exit(-1)
-    condition.append(list[1])
-    condition.append(list[0])
-    #condition.append(list[2])
-    #print(condition)
-    return condition
-
 
 """
 arguments[1] is the name of an input file or None. To get a file descriptor, the file is open; if None, standard input is used. This way, the rest of the program works with a file descriptor regardless of where the data comes from.
@@ -149,6 +126,11 @@ Similarly for output. This allows working with pipes.
 
 
 def set_input_output(arguments):
+    '''
+    function to set the input(file or stdin)and output(file or stdout) references
+    :param arguments: args provided by the user to the program
+    :return: arguments with output and input references updated
+    '''
     if (arguments[1]):
         try:
             infile = open(arguments[1])
@@ -176,6 +158,12 @@ this is the part that actually scans through the input and produces the output. 
 
 
 def myselect(arguments,firstline):
+    """
+    Function to perform selection on each line of the input
+    :param arguments: args provided by the user to the program
+    :param firstline: firstline of the input
+    :return: void
+    """
     condition = arguments[0]
     myinput = arguments[1]
     myoutput = arguments[2]
@@ -267,8 +255,8 @@ def myselect(arguments,firstline):
 def projection_cols(line,projectedcols):
     """
     The function takes a row and returns a modified row with required columns data
-    :param line:
-    :param columnsToProject:
+    :param line: line in the input
+    :param projectedcols: cols to project to output
     :return: user interested columns data separated by a separator
     """
     rowdata = line.split('|')
@@ -282,20 +270,18 @@ def main():
     #extracting all the arguments
     arguments = user_interface()
 
-    print(arguments)
     #setting input and output
     arguments = set_input_output(arguments)
 
-    #print(arguments)
     #column offset error handling (for header true and false)
     #grabbing the firstline to ensure we evaluate all lines
     firstline = column_offset_validation(arguments)
 
     #print(arguments)ls
     #parsing the condition
+
     try:
         arguments[0] = parsecondition(arguments[0])
-
         if arguments[0] == None:
             print('something broken in the condition or the parser')
             sys.exit(-1)
@@ -304,10 +290,7 @@ def main():
         print(e)
         sys.exit(-1)
 
-
     myselect(arguments,firstline)
-
-
     free_resources(arguments)
 
 main()
