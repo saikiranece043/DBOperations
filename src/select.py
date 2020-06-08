@@ -1,10 +1,10 @@
 #!/usr/bin/env pypy
 import sys
 import argparse
-from qtreeproc import run1_query_tree
-from parse_cond import parsecondition
+from src.qtreeproc import run1_query_tree
+from src.parse_cond import parsecondition
 
-
+sys.path.insert(0,'../src')
 """
 user_interface uses argparse to get arguments from command line 
 https://docs.python.org/2/library/argparse.html*/
@@ -295,15 +295,6 @@ def main():
 
 main()
 
-"""
-TO DO:
--error checking on condition.
--recursive condition parsing.
--error checking on column offset.
--handling comparisons on strings (how to denote in command line)
--header: allowing column denoted by name.
--additional parameter list for projection.
-"""
 
 
 
