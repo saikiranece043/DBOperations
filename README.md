@@ -62,3 +62,5 @@ op5->op5(right)->op6
 op6->op6(right)->op7
 op7->op7(right)->e
 ```
+
+<img width="757" alt="Screen Shot 2020-06-07 at 10 27 12 PM" src="https://user-images.githubusercontent.com/12020642/83987591-c6e8c000-a90e-11ea-96cd-25131a5c45a3.png">
