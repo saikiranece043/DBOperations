@@ -1,6 +1,6 @@
-#Performing Select Operations on User Input
+# Performing Select Operations on User Input
 
-### Sample commands from user
+#### Examples to run the program
 
 `python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv`
 
@@ -39,6 +39,7 @@
    * In the absence of projection the program wouldn't reduce the data written to output
    * In the presence of projection arg the program would write only the desired data to output stream
 
-### Positive Scenario Work Flow Chart
+#### Positive Scenario Work Flow Chart
 
 <img width="757" alt="Screen Shot 2020-06-07 at 10 27 12 PM" src="https://user-images.githubusercontent.com/12020642/83987591-c6e8c000-a90e-11ea-96cd-25131a5c45a3.png">
+```
