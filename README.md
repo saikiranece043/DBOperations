@@ -39,28 +39,6 @@
    * In the absence of projection the program wouldn't reduce the data written to output
    * In the presence of projection arg the program would write only the desired data to output stream
 
-### Flow of the program
-
-```flow
-st=>start: Start
-e=>end: End
-op1=>operation: User Interface
-op2=>operation: Setting Input Args
-op3=>operation: Column Offset Validation
-op4=>operation: Parsing Condition
-op5=>operation: Select
-op6=>operation: Execute QTree
-op7=>operation: projection
-
-
-st->op1(down)->op1
-op1->op2(right)->op2
-op2->op3(down)->op3
-op3->op3(right)->op4
-op4->op5(down)->op5
-op5->op5(right)->op6
-op6->op6(right)->op7
-op7->op7(right)->e
-```
+### Positive Scenario Work Flow Chart
 
 <img width="757" alt="Screen Shot 2020-06-07 at 10 27 12 PM" src="https://user-images.githubusercontent.com/12020642/83987591-c6e8c000-a90e-11ea-96cd-25131a5c45a3.png">
