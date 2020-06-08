@@ -4,22 +4,22 @@
 
 `python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv`
 
-`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv -p '#1,#2'`
+`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 = "test" )' -i foo.csv -h -o bar.csv -p '#1,#2' -s '|'`
 
 #### Args to the program
    * Condition (-c)
-   * input file (-i)
-   * output file (-o)
-   * header flag -h
-   * line separator -s (default value ',')
-   * projection -p
+   * Input File Path (-i)
+   * Output File Path (-o)
+   * Header Flag -h 
+   * Line Separator -s (default value ',')
+   * Projection -p
 
-#### Condition arg passed to the user
+#### Condition 
    * Condition is parsed by the ply lexer and parser
    * Extracts the tokens from the condition and a query tree is generated
    * The query tree is applied on each line of the input recursively
 
-#### Input to the program
+#### Input 
    * The input arg indicates the program should apply the condition on the contents of the file
    * Input data to the program can also be passed from the standard input
 
@@ -31,7 +31,7 @@
    * If the flag -h is found in the command the program would assume the input first line is header
    * In the absence the program would assume there is no header information in the input
 
-#### separator
+#### Separator
    * In the absence of -s the program would assume the input data delimiter is ','
    * User can overwrite this by sending an arg -s with their desired delimiter
 
