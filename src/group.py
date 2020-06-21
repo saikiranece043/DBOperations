@@ -1,5 +1,5 @@
-import argparse, sys,csv, re
-
+import argparse, sys, re, subprocess
+import copy
 
 def user_interface():
 	resultlist = []
@@ -120,15 +120,25 @@ def aggregate_func(aggfunc, line, args, attr, init):
 		free_resources(args)
 		sys.exit(-1)
 
+
+def sort_input(args):
+	attributes, input, output, hasheader, split, aggfunc = args
+	cmd = [ "sort", "-k", attributes , "-t", split ]
+	proc = subprocess.Popen(cmd,stdin=input, stdout=subprocess.PIPE, stderr= subprocess.PIPE)
+	o, e = proc.communicate()
+	#print('Output: ' + o.decode('ascii'))
+
+	with open("sortedfile","w") as f:
+		f.write(o.decode())
+
+
+
 def group_by(args):
 
 	attributes, input, output, hasheader, split, aggfunc = args
-
+	input = open("sortedfile")
 	aggfunclists = aggfunc.split(',')
 	attrlist = attributes.split(',')
-	"""
-	assuming the input is sorted perform aggregation
-	"""
 
 	aggattrlist = []
 	aggfunclist = []
@@ -138,18 +148,22 @@ def group_by(args):
 		aggfunclist.append(func.split('(')[0])
 
 
+
+	# an array to hold the aggregation values
 	init = []
 	init = reset_init(aggfunclist,args,init)
 
-
-
+	# initiating variables
 	firstIteration = True
 	currentgroupstring = ""
 	previousgroupstring = ""
+
+	# reading line by line and performing aggregations
 	for line in input:
 		datalist = line.split(split)
-		currentgroupstring = "".join([datalist[int(attr)] for attr in attrlist])
+		currentgroupstring = "".join([datalist[int(attr)-1] for attr in attrlist])
 
+		# executed only once for the first time
 		if firstIteration:
 			firstIteration = False
 			for index in range(0, len(aggattrlist)):
@@ -161,7 +175,7 @@ def group_by(args):
 			if currentgroupstring == previousgroupstring:
 				for index in range(0, len(aggattrlist)):
 					init[index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index], init[index])
-			## flush the init values to stdout or file, reset the init value
+			## you are here means new group flush the init values to stdout or file, reset the init value
 			else:
 				output.write(previousgroupstring + " ")
 				output.write(" ".join([str(x) for x in init]))
@@ -176,7 +190,60 @@ def group_by(args):
 	output.write(" ".join([str(x) for x in init]))
 	output.write('\n')
 
-def reset_init(aggfunclist,args,init):
+
+
+
+
+def group_by_hash(args):
+
+	attributes, input, output, hasheader, split, aggfunc = args
+	aggfunclists = aggfunc.split(',')
+	attrlist = attributes.split(',')
+
+	aggattrlist = []
+	aggfunclist = []
+
+	for func in aggfunclists:
+		aggattrlist.append(re.search(r'\((.*?)\)', func).group(1))
+		aggfunclist.append(func.split('(')[0])
+
+
+
+	# an array to hold the aggregation values
+
+	results = {}
+
+
+	firstiter = True
+	# reading line by line and performing aggregations
+	for line in input:
+		datalist = line.split(split)
+		groupingstring = "".join([datalist[int(attr)-1] for attr in attrlist])
+
+		if groupingstring in results:
+				# you have to update the results in the previous iteration
+
+				for index in range(0, len(aggattrlist)):
+					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index], results[groupingstring][index])
+
+		else:
+				# you would have to reset the init value and then update it
+				print("new group ",groupingstring)
+
+				results[groupingstring] = reset_init(aggfunclist,args)
+
+				for index in range(0, len(aggattrlist)):
+					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index], results[groupingstring][index])
+
+
+
+	print(results)
+
+
+
+
+def reset_init(aggfunclist,args,init=[]):
+
 	for aggfunc in aggfunclist:
 		if aggfunc == 'sum' or aggfunc == 'count':
 			init.append(0)
@@ -188,7 +255,7 @@ def reset_init(aggfunclist,args,init):
 			print("Unsupported Aggregate function")
 			free_resources(args)
 			sys.exit(-1)
-	return init
+	return copy.deepcopy(init)
 
 
 
@@ -197,7 +264,9 @@ def main():
 	args = user_interface()
 	args = set_input_output(args)
 	print(args)
+	sort_input(args)
 	group_by(args)
+	#group_by_hash(args)
 
 
 
