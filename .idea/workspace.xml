@@ -44,7 +44,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.group (1)">
     <configuration name="group (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="DBOperations" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -152,8 +152,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.group (1)" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.group" />
         <item itemvalue="Python.select" />
         <item itemvalue="Python.parse_cond" />
