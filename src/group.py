@@ -59,8 +59,8 @@ def column_offset_validation(arguments):
 					sys.exit(-1)
 
 		for attr in groupingattributes:
-			if attr.isdecimal():
-				data_error_handler("#" + str(attr), attributesCount, arguments, type="grouping")
+			if attr[1:].isdecimal():
+				data_error_handler(attr, attributesCount, arguments, type="grouping")
 			else:
 				# This block of code is executed for float or string
 				if attr not in header:
@@ -83,8 +83,8 @@ def column_offset_validation(arguments):
 
 		# print(groupingattributes)
 		for attr in groupingattributes:
-			if attr.isdecimal():
-				data_error_handler("#" + str(attr), attributesCount, arguments, type="grouping")
+			if attr[1:].isdecimal():
+				data_error_handler(attr, attributesCount, arguments, type="grouping")
 			else:
 				# This block of code is executed for float or string
 				print(f'aggregate column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
@@ -244,7 +244,7 @@ def group_by_hash(args, firstline):
 	'''
 	attributes, input, output, hasheader, split, aggfunc = args
 	aggfunclists = aggfunc.split(',')
-	attrlist = attributes.split(',')
+	attrlist = [attr[1:] for attr in attributes.split(',')]
 
 	aggattrlist = []
 	aggfunclist = []
@@ -300,7 +300,7 @@ def group_by_hash(args, firstline):
 			results[groupingstring][index] = aggregate_func(aggfunclist[index], firstline, args, aggattrlist[index],
 			                                                results[groupingstring][index])
 
-		# performing multiple aggregations per line and stored the results in dict
+		# performing multiple aggregations per line and store the results in dict
 		for line in input:
 			datalist = line.split(split)
 			groupingstring = "|".join([datalist[int(attr) - 1] for attr in attrlist])
@@ -311,7 +311,7 @@ def group_by_hash(args, firstline):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
 					                                                results[groupingstring][index])
 			else:
-				# you would have to reset the init value and then update it
+				# you would need to reset the init value and then update it
 				results[groupingstring] = reset_init(aggfunclist, args)
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
@@ -378,7 +378,7 @@ def pretty_print(results, args):
 def main():
 	args = user_interface()
 	args = set_input_output(args)
-	print(args)
+	#print(args)
 	firstline = column_offset_validation(args)
 	results = group_by_hash(args, firstline)
 	pretty_print(results, args)
