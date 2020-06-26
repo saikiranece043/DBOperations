@@ -1,4 +1,4 @@
-# Performing simple Aggregations on groups
+# Performing Simple Aggregations on attributes
 
 #### Examples to run the program
 
