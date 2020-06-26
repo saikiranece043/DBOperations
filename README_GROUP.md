@@ -15,7 +15,12 @@
    * Line Separator -s (default value ',')
    * Aggregations to apply on the groups -f
    
-
+### Supports Simple Aggregations 
+   * sum
+   * count
+   * avg
+   * min
+   * max
 
 #### Grouping Attributes 
    * Grouping attributes are extracted from the input
