@@ -15,7 +15,7 @@
    * Line Separator -s (default value ',')
    * Aggregations to apply on the groups -f
    
-### Supports Simple Aggregations 
+#### Supports Simple Aggregations 
    * sum
    * count
    * avg
