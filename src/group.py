@@ -177,9 +177,9 @@ def myeval(op, line, arguments):
 
 def type_conversion(val):
 	'''
-	Function to convert the input string to int or float
-	:param val:
-	:return: int or float
+	Function to convert the input string to int or float, if not either of them will throw an exception and exit
+	:param val: value of type string
+	:return: int or float,
 	'''
 	if val.isdecimal():
 		return int(val)
@@ -194,11 +194,11 @@ def type_conversion(val):
 def aggregate_func(aggfunc, line, args, attr, init):
 	'''
 	Function to perform simple aggregations conditionally
-	:param aggfunc:
-	:param line:
-	:param args:
-	:param attr:
-	:param init:
+	:param aggfunc: is a list of aggregations user wants to apply on the input
+	:param line: current line we are performing the aggregations on
+	:param args: all the args user provided on command line
+	:param attr: attribute that we are interested in the line
+	:param init: an array to keep track of previous aggregations
 	:return: aggregation result
 	'''
 	if aggfunc == 'sum':
@@ -213,22 +213,18 @@ def aggregate_func(aggfunc, line, args, attr, init):
 		init[2] = init[1] / init[0]
 		return init
 	elif aggfunc == 'min':
-		initialmin = init[1]
-		if initialmin:
-			val = myeval(attr, line, args)
-			return (val, False)
-		else:
-			val = myeval(attr, line, args)
-			return (val, False) if val < init[0] else (init[0], False)
-
+		mincheck = init[1]
+		val = myeval(attr, line, args)
+		if mincheck:
+			return (val, True) if val < init[0] else (init[0], True)
+		return (val, True)
 	elif aggfunc == 'max':
-		initialmax = init[1]
-		if initialmax:
-			val = myeval(attr, line, args)
-			return (val, False)
-		else:
-			val = myeval(attr, line, args)
-			return (val, False) if val > init[0] else (init[0], False)
+		maxcheck = init[1]
+		val = myeval(attr, line, args)
+		if maxcheck:
+			return (val, True) if val > init[0] else (init[0], True)
+		return (val, True)
+
 	else:
 		print("Unsupported aggregate Operation")
 		free_resources(args)
@@ -332,7 +328,7 @@ def reset_init(aggfunclist, args):
 		if aggfunc == 'sum' or aggfunc == 'count':
 			init.append(0)
 		elif aggfunc == 'min' or aggfunc == 'max':
-			init.append((0, True))
+			init.append((0, False))
 		elif aggfunc == 'avg':
 			init.append([0, 0, 0])
 		else:
@@ -381,7 +377,8 @@ def main():
 	#print(args)
 	firstline = column_offset_validation(args)
 	results = group_by_hash(args, firstline)
-	pretty_print(results, args)
+	#print(len(results))
+	pretty_print(results,args)
 
 
 main()
