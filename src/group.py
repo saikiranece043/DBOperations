@@ -202,33 +202,29 @@ def aggregate_func(aggfunc, line, args, attr, init):
 	:return: aggregation result
 	'''
 	if aggfunc == 'sum':
-		val = myeval(attr, line, args)
-		return val + init
+		return myeval(attr, line, args) + init
 	elif aggfunc == 'count':
 		return init + 1
 	elif aggfunc == 'avg':
-		val = myeval(attr, line, args)
 		init[0] = init[0] + 1
-		init[1] = val + init[1]
+		init[1] = myeval(attr, line, args) + init[1]
 		init[2] = init[1] / init[0]
 		return init
 	elif aggfunc == 'min':
-		mincheck = init[1]
 		val = myeval(attr, line, args)
-		if mincheck:
-			return (val, True) if val < init[0] else (init[0], True)
+		if init[1] and val > init[0]:
+			return (init[0], True)
 		return (val, True)
 	elif aggfunc == 'max':
-		maxcheck = init[1]
 		val = myeval(attr, line, args)
-		if maxcheck:
-			return (val, True) if val > init[0] else (init[0], True)
+		if init[1] and val < init[0]:
+			return (init[0], True)
 		return (val, True)
-
 	else:
 		print("Unsupported aggregate Operation")
 		free_resources(args)
 		sys.exit(-1)
+
 
 
 def group_by_hash(args, firstline):
@@ -267,47 +263,49 @@ def group_by_hash(args, firstline):
 			except:
 				attrlist[idx] = cols[attr] + 1
 
+		# converting attrlist to hold integers only ahead of time
+		attrlist = [int(attr) for attr in attrlist]
 		# aggregating the rest of the lines in file or stdin reading line by line
 		for line in input:
 			datalist = line.split(split)
-			groupingstring = "|".join([datalist[int(attr) - 1] for attr in attrlist])
+			groupingstring = "|".join([datalist[attr - 1] for attr in attrlist])
 
 			if groupingstring in results:
-				# you have to update the results in the previous iteration
+				# Performing aggregations to an existing group
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
 					                                                results[groupingstring][index])
 
 			else:
-				# you would have to reset the init value and then update it
+				# Performing aggregations to a new group
 				results[groupingstring] = reset_init(aggfunclist, args)
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
 					                                                results[groupingstring][index])
 
 	else:
-
+		# attrlist to hold integers ahead of time
+		attrlist = [int(attr) for attr in attrlist]
 		# performing multiple aggregations on first line to ensure the results are accurate
 		datalist = firstline.split(split)
-		groupingstring = "|".join([datalist[int(attr) - 1] for attr in attrlist])
+		groupingstring = "|".join([datalist[attr - 1] for attr in attrlist])
 		results[groupingstring] = reset_init(aggfunclist, args)
 
 		for index in range(0, len(aggattrlist)):
 			results[groupingstring][index] = aggregate_func(aggfunclist[index], firstline, args, aggattrlist[index],
 			                                                results[groupingstring][index])
-
 		# performing multiple aggregations per line and store the results in dict
 		for line in input:
 			datalist = line.split(split)
-			groupingstring = "|".join([datalist[int(attr) - 1] for attr in attrlist])
+			groupingstring = "|".join([datalist[attr - 1] for attr in attrlist])
 
 			if groupingstring in results:
-				# you have to update the results in the previous iteration
+				# Performing aggregations on an existing group
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
 					                                                results[groupingstring][index])
 			else:
-				# you would need to reset the init value and then update it
+				# Performing aggregations on a new group
 				results[groupingstring] = reset_init(aggfunclist, args)
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
@@ -319,7 +317,7 @@ def group_by_hash(args, firstline):
 def reset_init(aggfunclist, args):
 	'''
 	Resetting the init
-	:param aggfunclist:
+	:param aggfunclist: list of aggregate functions
 	:param args:
 	:return:
 	'''
@@ -340,7 +338,8 @@ def reset_init(aggfunclist, args):
 
 def pretty_print(results, args):
 	'''
-	This function is  to print the final results to stdoutput
+	This function is  to print the final results to std output
+	This is an expensive operation in terms of memory usage that we are temporarily relying on
 	:param results:
 	:param args:
 	:return: void
