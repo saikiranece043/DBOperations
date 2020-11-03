@@ -1,8 +1,8 @@
 #!/usr/bin/env pypy
 import sys
 import argparse
-from src.qtreeproc import run1_query_tree
-from src.parse_cond import parsecondition
+from qtreeproc import run1_query_tree
+from parse_cond import parsecondition
 
 sys.path.insert(0,'../src')
 """
@@ -28,7 +28,7 @@ def user_interface():
     parser.add_argument("-i", "--input", help="input file")
     parser.add_argument("-o", "--output", help="output file")
     parser.add_argument("-h", "--header", default=False, action="store_true", help="whether input file has header")
-    parser.add_argument("-s", "--split", default=',', help="line separator")
+    parser.add_argument("-s", "--split", default='|', help="line separator")
     parser.add_argument("-p", "--projection", help="columns to project")
     args = parser.parse_args()
     resultlist.append(args.condition)
@@ -66,31 +66,23 @@ def column_offset_validation(arguments):
     operands = arguments[0].split()
     hasheader = arguments[3]
 
-    if hasheader:
-        for operand in operands:
-            if operand.startswith('#'):
-                #if you are here the column offset can be a integer or string
-                if operand[1:].isdecimal():
-                    data_error_handler(operand,attributesCount,arguments)
-                else:
-                    # This block of code is executed for float or string
+    for operand in operands:
+        if operand.startswith('#'):
+            # if you are here the column offset can be a integer or string
+            if operand[1:].isdecimal():
+                data_error_handler(operand, attributesCount, arguments)
+            else:
+                # This block of code is executed for float or string
+                if hasheader:
                     if operand[1:] not in header:
                         print(f'column reference {operand} entered is incorrect')
                         free_resources(arguments)
                         sys.exit(-1)
-
-    else:
-        #no header so setting the file pointer back to first line
-        #if inputtype != None: (while going back is an option in files not for stdin)
-        #    inputfile.seek(0)
-        for operand in operands:
-            if operand.startswith('#'):
-                if operand[1:].isdecimal():
-                    data_error_handler(operand,attributesCount,arguments)
                 else:
                     print(f'column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
                     free_resources(arguments)
                     sys.exit(-1)
+
     return header
 
 
@@ -106,23 +98,16 @@ def data_error_handler(data,attributesCount,arguments):
     :return: void
     """
     # if you are here that means the column offset should always be an integer
-
     if not data[1:].isdecimal():
         print(f'The column offset {data} should be an integer')
         free_resources(arguments)
         sys.exit(-1)
     # the column offset should be between 0...(attributesCount - 1)
     if int(data[1:]) not in range(0,attributesCount):
-        print(f'The column offset {data} should be in the range (0, {attributesCount - 1 }) ')
+        print(f'The column offset {data} should be in the range (0, {attributesCount - 1 }) or you may have not passed the delimiter argument')
         free_resources(arguments)
         sys.exit(-1)
 
-
-
-"""
-arguments[1] is the name of an input file or None. To get a file descriptor, the file is open; if None, standard input is used. This way, the rest of the program works with a file descriptor regardless of where the data comes from.
-Similarly for output. This allows working with pipes.
-"""
 
 
 def set_input_output(arguments):
@@ -285,8 +270,9 @@ def main():
         if arguments[0] == None:
             print('something broken in the condition or the parser')
             sys.exit(-1)
+    except ValueError:
+        print("The condition should be wrapped in single quotes")
     except Exception as e:
-        free_resources(arguments)
         print(e)
         sys.exit(-1)
 
