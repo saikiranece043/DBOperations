@@ -2,14 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="489f594d-72dd-4baf-83b3-2a3adac76983" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/summary.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/test_group.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/DBOperations.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DBOperations.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/test.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/test_agg.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/test_summary.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/group.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/group.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/select.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/select.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test_parse_cond.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/test_parse_cond.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/test_select.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/test_select.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,15 +29,16 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test" />
+      <recent name="$PROJECT_DIR$/resources" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/test" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources" />
     </key>
   </component>
   <component name="RunDashboard">

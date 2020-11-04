@@ -4,7 +4,6 @@ import argparse
 from qtreeproc import run1_query_tree
 from parse_cond import parsecondition
 
-sys.path.insert(0,'../src')
 """
 user_interface uses argparse to get arguments from command line 
 https://docs.python.org/2/library/argparse.html*/
@@ -70,43 +69,21 @@ def column_offset_validation(arguments):
         if operand.startswith('#'):
             # if you are here the column offset can be a integer or string
             if operand[1:].isdecimal():
-                data_error_handler(operand, attributesCount, arguments)
+                if int(operand[1:]) not in range(0, attributesCount):
+                    if attributesCount == 1:
+                        raise Exception(f'Did you miss passing delimiter arg?')
+                    else:
+                        raise Exception(f'The column offset "{operand}" should be in the range (0, {attributesCount - 1})')
             else:
                 # This block of code is executed for float or string
                 if hasheader:
                     if operand[1:] not in header:
-                        print(f'column reference {operand} entered is incorrect')
-                        free_resources(arguments)
-                        sys.exit(-1)
+                        raise Exception(f'column offset "{operand}" entered is not found in input data header')
                 else:
-                    print(f'column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
-                    free_resources(arguments)
-                    sys.exit(-1)
+                    raise Exception(f'column offset "{operand}" cannot be a string as input data has no header')
 
     return header
 
-
-
-def data_error_handler(data,attributesCount,arguments):
-    """
-    Function performs validation of the input data
-    Checks if the data is string or integer
-    If the data is integer it further checks if it's contained within a range
-    :param data: data to validate for errors
-    :param attributesCount: number of columns in the input
-    :param arguments: args provided by the user to the program
-    :return: void
-    """
-    # if you are here that means the column offset should always be an integer
-    if not data[1:].isdecimal():
-        print(f'The column offset {data} should be an integer')
-        free_resources(arguments)
-        sys.exit(-1)
-    # the column offset should be between 0...(attributesCount - 1)
-    if int(data[1:]) not in range(0,attributesCount):
-        print(f'The column offset {data} should be in the range (0, {attributesCount - 1 }) or you may have not passed the delimiter argument')
-        free_resources(arguments)
-        sys.exit(-1)
 
 
 
@@ -120,8 +97,7 @@ def set_input_output(arguments):
         try:
             infile = open(arguments[1])
         except IOError:
-            print('There was an error opening the input file!')
-            exit(-1);
+            raise Exception('There was an error opening the input file!')
     else:
         infile = sys.stdin
     arguments[1] = infile
@@ -129,8 +105,7 @@ def set_input_output(arguments):
         try:
             outfile = open(arguments[2],mode='w')
         except IOError:
-            print('There was an error opening the output file!')
-            exit(-1);
+            raise Exception('There was an error opening the output file!')
     else:
         outfile = sys.stdout
     arguments[2] = outfile
@@ -175,13 +150,11 @@ def myselect(arguments,firstline):
         for colref in projection.split(','):
             if colref[1:].isdecimal():
                 if colref[1:] not in range(0, totalcols):
-                    print("The column referenced in projection by number is invalid")
-                    sys.exit(-1)
+                    raise Exception("The column referenced in projection by number is invalid")
                 colstoproject.append(int(colref[1:])-1)
             else:
                 if colref[1:] not in firstline.split(splitter):
-                    print("The column referenced in projection by name is invalid")
-                    sys.exit(-1)
+                    raise Exception("The column referenced in projection by name is invalid")
                 colstoproject.append(int(cols[colref[1:]]))
 
         # if projection is required a different path to be taken
@@ -211,12 +184,10 @@ def myselect(arguments,firstline):
                 if colref[1:].isdecimal():
                     colrefi = int(colref[1:])
                     if colrefi not in range(0,totalcols):
-                        print("The column referenced in projection by number is not invalid")
-                        sys.exit(-1)
+                        raise Exception("The column referenced in projection by number is not invalid")
                     colstoproject.append(colrefi - 1)
                 else:
-                    print("The column referenced in projection by number is a string so invalid")
-                    sys.exit(-1)
+                    raise Exception("The column referenced in projection by number is a string so invalid")
 
 
             # selection performed on the first line
@@ -251,36 +222,22 @@ def projection_cols(line,projectedcols):
 
 # main program starts here
 def main():
-
-    #extracting all the arguments
-    arguments = user_interface()
-
-    #setting input and output
-    arguments = set_input_output(arguments)
-
-    #column offset error handling (for header true and false)
-    #grabbing the firstline to ensure we evaluate all lines
-    firstline = column_offset_validation(arguments)
-
-    #print(arguments)ls
-    #parsing the condition
-
     try:
+        arguments = user_interface()
+        arguments = set_input_output(arguments)
+        print(arguments)
+        firstline = column_offset_validation(arguments)
         arguments[0] = parsecondition(arguments[0])
-        if arguments[0] == None:
-            print('something broken in the condition or the parser')
-            sys.exit(-1)
-    except ValueError:
-        print("The condition should be wrapped in single quotes")
+        if not arguments[0]:
+            raise Exception('parser evaluating the select condition failed')
+        myselect(arguments, firstline)
+        free_resources(arguments)
     except Exception as e:
         print(e)
-        sys.exit(-1)
 
-    myselect(arguments,firstline)
-    free_resources(arguments)
 
-main()
-
+if __name__ == "__main__":
+    main()
 
 
 
