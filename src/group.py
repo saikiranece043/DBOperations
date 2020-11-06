@@ -1,7 +1,7 @@
 import argparse, sys, re
 import copy
 from prettytable import PrettyTable
-
+from sys import intern
 
 def user_interface():
 	resultlist = []
@@ -36,7 +36,6 @@ def column_offset_validation(arguments):
 		aggattrlist.append(re.search(r'\((.*?)\)', func).group(1))
 
 	groupingattributes = arguments[0].split(',')
-
 	inputfile = arguments[1]
 	header = inputfile.readline()
 	splitter = arguments[4]
@@ -44,29 +43,38 @@ def column_offset_validation(arguments):
 	# operands = arguments[0].split(',')
 	operands = aggattrlist
 	hasheader = arguments[3]
-
 	if hasheader:
 		for operand in operands:
-
-			# if you are here the column offset can be a integer or string
-			if operand[1:].isdecimal():
-				data_error_handler(operand, attributesCount, arguments, type="aggregation")
+			if operand.startswith('#'):
+				# if you are here the column offset can be a integer or string
+				if operand[1:].isdecimal():
+					data_error_handler(operand, attributesCount, arguments, type="aggregation")
+				else:
+					# This block of code is executed for float or string
+					if operand[1:] not in header.split(splitter):
+						print(operand[1:])
+						print(f'aggregate column reference {operand} entered is incorrect')
+						free_resources(arguments)
+						sys.exit(-1)
 			else:
-				# This block of code is executed for float or string
-				if operand[1:] not in header:
-					print(f'aggregate column reference {operand} entered is incorrect')
-					free_resources(arguments)
-					sys.exit(-1)
+				print(f' {operand} aggregate column reference should start with "#"')
+				free_resources(arguments)
+				sys.exit(-1)
 
 		for attr in groupingattributes:
-			if attr[1:].isdecimal():
-				data_error_handler(attr, attributesCount, arguments, type="grouping")
+			if attr.startswith('#'):
+				if attr[1:].isdecimal():
+					data_error_handler(attr, attributesCount, arguments, type="grouping")
+				else:
+					# This block of code is executed for float or string
+					if attr[1:] not in header.split(splitter):
+						print(f'grouping column reference {attr} entered is incorrect')
+						free_resources(arguments)
+						sys.exit(-1)
 			else:
-				# This block of code is executed for float or string
-				if attr not in header:
-					print(f'grouping column reference {operand} entered is incorrect')
-					free_resources(arguments)
-					sys.exit(-1)
+				print(f' {attr} grouping column reference should start with "#"')
+				free_resources(arguments)
+				sys.exit(-1)
 
 
 	else:
@@ -74,22 +82,34 @@ def column_offset_validation(arguments):
 		# if inputtype != None: (while going back is an option in files not for stdin)
 		#    inputfile.seek(0)
 		for operand in operands:
-			if operand[1:].isdecimal():
-				data_error_handler(operand, attributesCount, arguments, type="aggregation")
+			if operand.startswith('#'):
+				if operand[1:].isdecimal():
+					data_error_handler(operand, attributesCount, arguments, type="aggregation")
+				else:
+					print(f'grouping column reference {operand} cannot be a string or float, perhaps you forgot to pass "-h" arg')
+					free_resources(arguments)
+					sys.exit(-1)
 			else:
-				print(f'grouping column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
+				print(f' {operand} aggregate column reference should start with "#"')
 				free_resources(arguments)
 				sys.exit(-1)
 
+
 		# print(groupingattributes)
 		for attr in groupingattributes:
-			if attr[1:].isdecimal():
-				data_error_handler(attr, attributesCount, arguments, type="grouping")
+			if attr.startswith('#'):
+				if attr[1:].isdecimal():
+					data_error_handler(attr, attributesCount, arguments, type="grouping")
+				else:
+					# This block of code is executed for float or string
+					print(f'aggregate column reference {operand} cannot be a string or float, perhaps you forgot to pass "-h" arg')
+					free_resources(arguments)
+					sys.exit(-1)
 			else:
-				# This block of code is executed for float or string
-				print(f'aggregate column reference {operand} cannot be a string, perhaps you forgot to pass "-h" arg')
+				print(f' {attr} grouping column reference should start with "#"')
 				free_resources(arguments)
 				sys.exit(-1)
+
 
 	return header
 
@@ -300,7 +320,7 @@ def group_by_hash(args, firstline):
 			groupingstring = "|".join([datalist[attr - 1] for attr in attrlist])
 
 			if groupingstring in results:
-				# Performing aggregations on an existing group
+				# Performing aggregations on an existing groupgroupingstring = intern(groupingstring)
 				for index in range(0, len(aggattrlist)):
 					results[groupingstring][index] = aggregate_func(aggfunclist[index], line, args, aggattrlist[index],
 					                                                results[groupingstring][index])
@@ -344,9 +364,12 @@ def pretty_print(results, args):
 	:param args:
 	:return: void
 	'''
-	attributes, input, output, hasheader, split, aggfunc = args
-	aggfunclists = aggfunc.split(',')
+	if args[3]:
+		attributes, input, output, hasheader, split, aggfunc, _ = args
+	else:
+		attributes, input, output, hasheader, split, aggfunc = args
 
+	aggfunclists = aggfunc.split(',')
 	aggattrlist = []
 	aggfunclist = []
 
@@ -378,6 +401,7 @@ def main():
 	results = group_by_hash(args, firstline)
 	#print(len(results))
 	pretty_print(results,args)
+	#print(results)
 
 
 main()
