@@ -146,3 +146,7 @@ resources/
 # ignore tracking of pypy virtual environment
 .pypy/
 
+/.DS_Store
+node_modules/
+package-lock.json
+.idea/workspace.xml

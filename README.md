@@ -2,9 +2,9 @@
 
 #### Examples to run the program
 
-`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv`
+`pypy3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv`
 
-`python3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv -p '#1,#2' -s '|'`
+`pypy3 select.py -c '#1 > 2 and ( #2 >= 5 and #2 == "test" )' -i foo.csv -h -o bar.csv -p '#1,#2' -s '|'`
 
 #### Args to the program
    * Condition (-c)

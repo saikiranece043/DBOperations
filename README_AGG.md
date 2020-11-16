@@ -2,9 +2,9 @@
 
 #### Examples to run the program
 
-`python3 agg.py -a '#14' -f "max" -s '|' -i ../resources/test.csv`
+`pypy3 agg.py -a '#14' -f "max" -s '|' -i foo.csv`
 
-`python3 agg.py -a '#14,#discount' -f "max,min" -s '|' -i '../resources/test.csv' -h -o '../resources/out'`
+`pypy3 agg.py -a '#14,#discount' -f "max,min" -s '|' -i foo.csv -h -o bar.csv`
 
 
 #### Conditions of the program
