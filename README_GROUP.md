@@ -2,9 +2,9 @@
 
 #### Examples to run the program
 
-`pypy3 group.py -a '#14' -f "max(#1)" -s '|' -i ../resources/test.csv`
+`pypy3 group.py -a '#14' -f "max(#1)" -s '|' -i foo.csv`
 
-`pypy3 group.py -a '#14,#discount' -f "max(#1),min(#quantity)" -s '|' -i '../resources/test.csv' -h -o '../resources/out'`
+`pypy3 group.py -a '#14,#discount' -f "max(#1),min(#quantity)" -s '|' -i foo.csv -h -o bar.csv`
 
 
 #### Args to the program
