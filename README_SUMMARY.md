@@ -3,6 +3,7 @@
 #### Examples to run the program
 
 `pypy summary.py -h -c ‘#14’ -f input.csv`
+
 `cat input.csv | pypy summary.py -c '#14, #discount ' -h`
 
 #### Args to the program
