@@ -1,4 +1,3 @@
-https://dev.azure.com/s0pott05/glennissolutions/_apis/build/status/saikiranece043.DBOperations?branchName=master
 [![Build Status](https://dev.azure.com/s0pott05/glennissolutions/_apis/build/status/saikiranece043.DBOperations?branchName=master)](https://dev.azure.com/s0pott05/glennissolutions/_build/latest?definitionId=4&branchName=master)
 
 # Performing Select Operations on User Input
