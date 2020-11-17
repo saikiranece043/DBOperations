@@ -1,3 +1,4 @@
+[![Build Status](https://dev.azure.com/s0pott05/glennissolutions/_apis/build/status/saikiranece043.DBOperations?branchName=master)](https://dev.azure.com/s0pott05/glennissolutions/_build/latest?definitionId=4&branchName=master)
 # Performing Simple Aggregations On Attributes
 
 #### Examples to run the program
@@ -5,7 +6,6 @@
 `pypy3 agg.py -a '#14' -f "max" -s '|' -i foo.csv`
 
 `pypy3 agg.py -a '#14,#discount' -f "max,min" -s '|' -i foo.csv -h -o bar.csv`
-
 
 #### Conditions of the program
    * The number of attributes and aggregation functions in the input should be same
