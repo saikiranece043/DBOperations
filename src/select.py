@@ -225,7 +225,6 @@ def main():
     try:
         arguments = user_interface()
         arguments = set_input_output(arguments)
-        print(arguments)
         firstline = column_offset_validation(arguments)
         arguments[0] = parsecondition(arguments[0])
         if not arguments[0]:
