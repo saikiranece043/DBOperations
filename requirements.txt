@@ -22,7 +22,7 @@ python-dateutil==2.8.1
 pytz==2020.1
 requests==2.24.0
 six==1.15.0
-urllib3==1.25.11
+urllib3==1.26.5
 wcwidth==0.2.5
 yarg==0.1.9
 zipp==3.1.0
